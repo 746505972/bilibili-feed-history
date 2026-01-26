@@ -257,7 +257,7 @@ function injectControlPanel() {
       position: fixed;
       left: -50px;
       top: 80px;
-      width: 600px;
+      width: 800px;
       z-index: 99999;
     }
 
@@ -323,16 +323,23 @@ function injectControlPanel() {
       border-radius: 4px;
     }
     
+    
     #history-videos {
       max-height: 50vh;
       overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);  /* 3列网格布局 */
+      gap: 10px;  /* 卡片之间的间距 */
     }
     
     .history-card {
-      margin-bottom: 10px;
+      padding: 5px;
+      margin-bottom: 0;  /* 因为grid布局，不需要额外的margin */
       border: 1px solid #eee;
       border-radius: 4px;
       overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     
     .history-item-header {
