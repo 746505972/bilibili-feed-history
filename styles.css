@@ -1,0 +1,53 @@
+/* Bilibili Feed History 插件样式 */
+
+#bilibili-feed-history-panel {
+  position: fixed;
+  right: 20px;
+  top: 200px;
+  width: 300px;
+  z-index: 9999;
+}
+
+#history-toggle-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #fb7299;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+#history-content {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 10px;
+  padding: 15px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+}
+
+#history-videos {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.history-card {
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.history-item-header {
+  background: #f5f5f5;
+  padding: 5px;
+  font-size: 12px;
+  color: #666;
+}

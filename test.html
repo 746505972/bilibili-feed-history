@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilibili Feed History Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .feed-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feed-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .thumbnail {
+            width: 120px;
+            height: 80px;
+            background: #ccc;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .info {
+            flex: 1;
+        }
+        
+        .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .meta {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        #test-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #fb7299;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10000;
+        }
+        
+        #history-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 9999;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .history-card {
+            background: #f8f8f8;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .history-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <button id="test-button">测试按钮</button>
+    
+    <div class="feed-container">
+        <h1>Bilibili 推荐视频</h1>
+        <div class="feed-card">
+            <div class="thumbnail">视频1</div>
+            <div class="info">
+                <div class="title">测试视频标题 1</div>
+                <div class="meta">UP主：测试UP主 | 播放：10万+</div>
+            </div>
+        </div>
+        
+        <div class="feed-card">
+            <div class="thumbnail">视频2</div>
+            <div class="info">
+                <div class="title">测试视频标题 2</div>
+                <div class="meta">UP主：另一个UP主 | 播放：5万</div>
+            </div>
+        </div>
+        
+        <div class="feed-card">
+            <div class="thumbnail">视频3</div>
+            <div class="info">
+                <div class="title">测试视频标题 3</div>
+                <div class="meta">UP主：又一个UP主 | 播放：1万</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="history-panel">
+        <h2>历史记录</h2>
+        <div id="history-content">
+            <p>这里将显示历史记录...</p>
+        </div>
+    </div>
+
+    <script>
+        // 模拟插件功能
+        let history = [];
+        
+        document.getElementById('test-button').addEventListener('click', function() {
+            alert('按钮被点击了！方案可行！');
+            
+            // 显示历史面板
+            document.getElementById('history-panel').style.display = 'block';
+        });
+        
+        // 模拟移除卡片并保存到历史记录
+        function simulateRemoveCard() {
+            const cards = document.querySelectorAll('.feed-card');
+            if(cards.length > 0) {
+                const cardToRemove = cards[cards.length - 1];
+                
+                // 添加到历史记录
+                history.push({
+                    element: cardToRemove.cloneNode(true),
+                    timestamp: new Date().toISOString()
+                });
+                
+                // 从页面移除
+                cardToRemove.remove();
+                
+                console.log('已保存卡片到历史记录，总数：', history.length);
+            }
+        }
+        
+        // 添加模拟移除按钮
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '模拟移除卡片';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '20px';
+        removeBtn.style.left = '150px';
+        removeBtn.addEventListener('click', simulateRemoveCard);
+        document.body.appendChild(removeBtn);
+        
+        // 添加查看历史按钮
+        const viewHistoryBtn = document.createElement('button');
+        viewHistoryBtn.textContent = '查看历史记录';
+        viewHistoryBtn.style.position = 'absolute';
+        viewHistoryBtn.style.top = '20px';
+        viewHistoryBtn.style.left = '300px';
+        viewHistoryBtn.addEventListener('click', function() {
+            document.getElementById('history-panel').style.display = 'block';
+        });
+        document.body.appendChild(viewHistoryBtn);
+    </script>
+</body>
+</html>
