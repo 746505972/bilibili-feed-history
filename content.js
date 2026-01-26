@@ -264,7 +264,7 @@ function injectControlPanel() {
     #history-toggle-btn {
       width: 120px;
       height: 40px;
-      background-color: #fb7299;
+      background-color: #fb72991e;
       color: white;
       display: flex;
       justify-content: center;
@@ -279,11 +279,8 @@ function injectControlPanel() {
     
     #history-content {
       background: white;
-      border: 2px solid #fb7299;
-      border-radius: 8px;
       margin-top: 10px;
       padding: 15px;
-      max-height: 60vh;
       overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
