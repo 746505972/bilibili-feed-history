@@ -239,7 +239,7 @@ function injectControlPanel() {
   const panel = document.createElement('div');
   panel.id = 'bilibili-feed-history-panel';
   panel.innerHTML = `
-    <div id="history-toggle-btn" title="显示/隐藏历史推荐">🕒 历史</div>
+    <div id="history-toggle-btn" title="显示/隐藏历史推荐">历史🕒</div>
     <div id="history-content" style="display: none;">
       <div class="history-header">
         <h3>B站推荐历史</h3>
@@ -255,31 +255,39 @@ function injectControlPanel() {
   style.textContent = `
     #bilibili-feed-history-panel {
       position: fixed;
-      left: 20px;
-      top: 20px;
-      width: 300px;
+      left: -50px;
+      top: 80px;
+      width: 600px;
       z-index: 99999;
     }
-    
+
+    #bilibili-feed-history-panel:hover {
+      left: 0;
+      transition: left 0.3s ease;
+    }
+
     #history-toggle-btn {
-      width: 120px;
-      height: 40px;
-      background-color: #fb72991e;
+      position: absolute; 
+      padding-left: 20px;
+      height: 30px;
+      background-color: #fb7299;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 14px;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 0 4px 4px 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       text-align: center;
       font-weight: bold;
+      transform-origin: right top;
+      margin-top: 10px;
     }
     
     #history-content {
-      background: white;
-      margin-top: 10px;
+      background: hsla(0,0%,100%,.9);
+      margin-top: 40px;
       padding: 15px;
       overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -378,15 +386,21 @@ function refreshHistoryDisplay() {
   [...feedHistory].reverse().forEach((item, index) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'history-card';
-    wrapper.innerHTML = `
-      <div class="history-item-header">${new Date(item.timestamp).toLocaleString()}</div>
-    `;
+    // 将时间移到底部，这里只保留卡片内容
+    wrapper.innerHTML = '';
     
     // 添加克隆的卡片
     const clonedCard = item.element.cloneNode(true);
     // 清理可能存在的危险属性
     cleanClonedElement(clonedCard);
     wrapper.appendChild(clonedCard);
+    
+    // 添加时间信息到底部
+    const timeFooter = document.createElement('div');
+    timeFooter.className = 'history-item-footer';
+    timeFooter.textContent = new Date(item.timestamp).toLocaleString();
+    timeFooter.style.cssText = 'text-align: right; padding: 5px; font-size: 12px; color: #666; background: rgb(249 249 249 / 50%);';
+    wrapper.appendChild(timeFooter);
     
     container.appendChild(wrapper);
   });
