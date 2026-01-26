@@ -6,11 +6,8 @@ let isInitialized = false;
 // 初始化插件
 function initBilibiliFeedHistory() {
   if (isInitialized) {
-    console.log('插件已初始化，跳过重复初始化');
     return;
   }
-  
-  console.log('Bilibili Feed History 插件开始初始化');
   
   // 监听页面变化，特别是推荐视频区域的变化
   startObserving();
@@ -19,7 +16,6 @@ function initBilibiliFeedHistory() {
   injectControlPanel();
   
   isInitialized = true;
-  console.log('Bilibili Feed History 插件初始化完成');
 }
 
 // 开始监听页面变化
@@ -31,7 +27,6 @@ function startObserving() {
                    document.querySelector('body');
                    
   if (!targetNode) {
-    console.log('未找到目标节点，1秒后重试');
     // 如果没找到节点，稍后再试
     setTimeout(startObserving, 1000);
     return;
@@ -53,17 +48,12 @@ function startObserving() {
               // 检查当前节点的后代节点
               const feedCards = node.querySelectorAll && node.querySelectorAll('.feed-card, [class*="video-card"], [class*="bili-video-card"]');
               if (feedCards) {
-                console.log('发现移除的视频卡片节点，数量:', feedCards.length);
                 for (let i = 0; i < feedCards.length; i++) {
                   removedVideoCount += saveFeedCard(feedCards[i]);
                 }
               }
             }
           });
-          
-          if (removedVideoCount > 0) {
-            console.log(`本次操作共保存了 ${removedVideoCount} 个视频卡片`);
-          }
         }
         
         // 检查新增节点，确保我们正在跟踪正确的区域
@@ -84,8 +74,6 @@ function startObserving() {
     childList: true, 
     subtree: true 
   });
-  
-  console.log('Mutation Observer 已启动，观察目标:', targetNode.tagName);
 }
 
 // 检查并保存feed-card元素，返回保存的卡片数量
@@ -97,7 +85,6 @@ function checkAndSaveFeedCards(node) {
   
   for (const selector of possibleSelectors) {
     if (node.matches && node.matches(selector)) {
-      console.log('发现匹配的视频卡片节点:', selector);
       if (saveFeedCard(node)) savedCount++;
       return savedCount;
     }
@@ -108,7 +95,6 @@ function checkAndSaveFeedCards(node) {
     // 尝试多种可能的视频卡片类名
     const feedCards = node.querySelectorAll('.feed-card, [class*="video-card"], [class*="bili-video-card"]');
     if (feedCards.length > 0) {
-      console.log('在节点内发现视频卡片数量:', feedCards.length);
       for (let i = 0; i < feedCards.length; i++) {
         if (saveFeedCard(feedCards[i])) {
           savedCount++;
@@ -127,8 +113,6 @@ function saveFeedCard(feedCardElement) {
     return false;
   }
   
-  console.log('准备保存视频卡片:', feedCardElement);
-  
   // 克隆元素以避免事件处理器等问题
   const clonedCard = feedCardElement.cloneNode(true);
   
@@ -140,15 +124,12 @@ function saveFeedCard(feedCardElement) {
   
   // 如果无法生成有效ID，跳过保存
   if (!cardId || cardId === 'card_') {
-    console.log('无法为视频卡片生成有效ID，跳过保存');
     return false;
   }
   
   const existingIndex = feedHistory.findIndex(item => item.id === cardId);
   
   if (existingIndex === -1) {
-    console.log('保存新的视频卡片，ID:', cardId);
-    
     // 添加到历史记录
     feedHistory.push({
       id: cardId,
@@ -165,7 +146,6 @@ function saveFeedCard(feedCardElement) {
     saveToStorage();
     return true;
   } else {
-    console.log('该视频卡片已存在，跳过保存，ID:', cardId);
     return false;
   }
 }
@@ -212,7 +192,6 @@ function generateCardId(cardElement) {
 
 // 保存到浏览器存储
 function saveToStorage() {
-  console.log('准备保存到本地存储，历史记录数量:', feedHistory.length);
   chrome.storage.local.set({ 
     feedHistory: feedHistory.map(item => ({
       id: item.id,
@@ -222,25 +201,20 @@ function saveToStorage() {
   }, function() {
     if (chrome.runtime.lastError) {
       console.error('保存历史记录失败:', chrome.runtime.lastError);
-    } else {
-      console.log(`已保存 ${feedHistory.length} 个视频到历史记录`);
     }
   });
 }
 
 // 从存储加载历史记录
 async function loadFromStorage() {
-  console.log('开始从存储加载历史记录');
   return new Promise((resolve) => {
     chrome.storage.local.get(['feedHistory'], function(result) {
-      console.log('从存储加载的数据:', result);
       if (result.feedHistory) {
         feedHistory = result.feedHistory.map(item => ({
           id: item.id,
           element: createElementFromHTML(item.html),
           timestamp: item.timestamp
         }));
-        console.log('加载完成，历史记录数量:', feedHistory.length);
       }
       resolve();
     });
@@ -256,11 +230,8 @@ function createElementFromHTML(htmlString) {
 
 // 注入控制面板到页面
 function injectControlPanel() {
-  console.log('开始注入控制面板');
-  
   // 检查是否已经注入过
   if (document.getElementById('bilibili-feed-history-panel')) {
-    console.log('控制面板已存在，无需重复注入');
     return;
   }
   
@@ -279,7 +250,7 @@ function injectControlPanel() {
     </div>
   `;
   
-  // 添加样式 - 按钮现在使用更明显的位置
+  // 添加样式
   const style = document.createElement('style');
   style.textContent = `
     #bilibili-feed-history-panel {
@@ -287,7 +258,7 @@ function injectControlPanel() {
       left: 20px;
       top: 20px;
       width: 300px;
-      z-index: 99999; /* 更高的z-index值 */
+      z-index: 99999;
     }
     
     #history-toggle-btn {
@@ -308,7 +279,7 @@ function injectControlPanel() {
     
     #history-content {
       background: white;
-      border: 2px solid #fb7299; /* 更明显的边框 */
+      border: 2px solid #fb7299;
       border-radius: 8px;
       margin-top: 10px;
       padding: 15px;
@@ -378,29 +349,23 @@ function injectControlPanel() {
   
   // 加载历史记录
   loadFromStorage().then(() => {
-    console.log('历史记录加载完成，准备刷新显示');
     refreshHistoryDisplay();
   });
 }
 
 // 切换历史面板显示/隐藏
 function toggleHistoryPanel() {
-  console.log('切换历史面板状态');
   const content = document.getElementById('history-content');
   if (content.style.display === 'none') {
-    console.log('显示历史面板');
     content.style.display = 'block';
     refreshHistoryDisplay();
   } else {
-    console.log('隐藏历史面板');
     content.style.display = 'none';
   }
 }
 
 // 刷新历史记录显示
 function refreshHistoryDisplay() {
-  console.log('刷新历史记录显示，当前历史记录数量:', feedHistory.length);
-  
   // 更新统计数字
   document.getElementById('history-count-display').textContent = feedHistory.length;
   
@@ -428,8 +393,6 @@ function refreshHistoryDisplay() {
     
     container.appendChild(wrapper);
   });
-  
-  console.log('历史记录显示刷新完成');
 }
 
 // 清理克隆元素，移除可能的安全风险
@@ -481,7 +444,6 @@ function injectRefreshButton(node) {
   }
   
   if (refreshBtn && !document.getElementById('custom-history-btn')) {
-    console.log('在刷新按钮旁注入自定义按钮');
     const customBtn = document.createElement('button');
     customBtn.id = 'custom-history-btn';
     customBtn.textContent = '查看历史推荐';
@@ -496,7 +458,6 @@ function injectRefreshButton(node) {
     `;
     
     customBtn.addEventListener('click', function() {
-      console.log('点击了自定义历史按钮');
       toggleHistoryPanel();
     });
     
@@ -509,19 +470,14 @@ function injectRefreshButton(node) {
 
 // 确保页面完全加载后初始化插件
 function ensurePageLoaded() {
-  console.log('检查页面加载状态:', document.readyState);
-  
   if (document.readyState === 'loading') {
-    console.log('文档仍在加载中，等待DOMContentLoaded事件');
     document.addEventListener('DOMContentLoaded', initBilibiliFeedHistory);
   } else {
-    console.log('文档已加载，直接初始化插件');
     // 确保DOM完全构建后再初始化
     setTimeout(() => {
       if (document.querySelector('#app') || document.querySelector('#i_cecream') || document.querySelector('main')) {
         initBilibiliFeedHistory();
       } else {
-        console.log('未找到B站页面容器，延迟1秒再试');
         setTimeout(initBilibiliFeedHistory, 1000);
       }
     }, 1000);
@@ -531,7 +487,6 @@ function ensurePageLoaded() {
 // 页面可见性改变时重新检查
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
-    console.log('页面变为可见状态');
     // 页面变为可见时，重新尝试注入按钮
     setTimeout(injectRefreshButton, 1000);
   }
@@ -543,7 +498,6 @@ ensurePageLoaded();
 // 额外的安全措施：如果页面已经加载但插件未初始化，则强制初始化
 window.addEventListener('load', function() {
   if (!isInitialized) {
-    console.log('通过window.load事件进行最终初始化');
     setTimeout(initBilibiliFeedHistory, 2000);
   }
 });
