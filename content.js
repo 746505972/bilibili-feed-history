@@ -243,6 +243,7 @@ function injectControlPanel() {
     <div id="history-content" style="display: none;">
       <div class="history-header">
         <h3>B站推荐历史</h3>
+        <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: #ff69b4; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">清空历史</button>
         <span id="close-history-btn" title="关闭">×</span>
       </div>
       <div id="history-stats">已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</div>
@@ -277,7 +278,7 @@ function injectControlPanel() {
       align-items: center;
       font-size: 14px;
       cursor: pointer;
-      border-radius: 0 4px 4px 0;
+      border-radius: 0 30px 30px 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       text-align: center;
       font-weight: bold;
@@ -291,6 +292,7 @@ function injectControlPanel() {
       padding: 15px;
       overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border-radius: 4px;
     }
     
     .history-header {
@@ -321,6 +323,9 @@ function injectControlPanel() {
       padding: 5px;
       background: #f9f9f9;
       border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     
     
@@ -359,10 +364,25 @@ function injectControlPanel() {
     document.getElementById('history-content').style.display = 'none';
   });
   
+  // 添加清空历史记录按钮事件监听器
+  document.getElementById('clear-history-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); // 阻止事件冒泡
+    clearHistory();
+  });
+  
   // 加载历史记录
   loadFromStorage().then(() => {
     refreshHistoryDisplay();
   });
+}
+
+// 清空历史记录
+function clearHistory() {
+  if (confirm('确定要清空所有历史记录吗？此操作不可撤销！')) {
+    feedHistory = [];
+    saveToStorage();
+    refreshHistoryDisplay();
+  }
 }
 
 // 切换历史面板显示/隐藏
