@@ -243,10 +243,14 @@ function injectControlPanel() {
     <div id="history-content" style="display: none;">
       <div class="history-header">
         <h3>B站推荐历史</h3>
-        <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: #ff69b4; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">清空历史</button>
+        <div>
+          <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: #ff69b4; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">清空历史</button>
+          <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">刷新</button>
+          <button id="theme-toggle-btn" title="切换暗黑主题" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🌙</button>
+        </div>
+        <div id="history-stats">已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</div>
         <span id="close-history-btn" title="关闭">×</span>
       </div>
-      <div id="history-stats">已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</div>
       <div id="history-videos"></div>
     </div>
   `;
@@ -271,7 +275,7 @@ function injectControlPanel() {
       position: absolute; 
       padding-left: 20px;
       height: 30px;
-      background-color: #fb7299;
+      background-color: #fb729970;
       color: white;
       display: flex;
       justify-content: center;
@@ -292,7 +296,42 @@ function injectControlPanel() {
       padding: 15px;
       overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      border-radius: 4px;
+      border-radius: 10px;
+    }
+    
+    /* 暗黑主题样式 */
+    .dark-theme {
+      background: rgba(33, 33, 33, .9) !important;
+      color: #ddd;
+    }
+    
+    .dark-theme .history-header {
+      border-bottom: 1px solid #444;
+    }
+    
+    .dark-theme .history-header h3 {
+      color: #ff85a2;
+    }
+    
+    .dark-theme #history-stats {
+      background: #2d2d2d;
+      color: #aaa;
+    }
+    
+    .dark-theme .history-card {
+      border: 1px solid #444;
+      background: #2d2d2d70;
+      color: #ddd;
+    }
+    
+    .dark-theme .history-item-header {
+      background: #3a3a3a;
+      color: #aaa;
+    }
+    
+    .dark-theme .history-item-footer {
+      background: #2a2a2a70 !important;
+      color: #bbb;
     }
     
     .history-header {
@@ -319,7 +358,6 @@ function injectControlPanel() {
     #history-stats {
       color: #666;
       font-size: 14px;
-      margin-bottom: 10px;
       padding: 5px;
       background: #f9f9f9;
       border-radius: 4px;
@@ -335,6 +373,7 @@ function injectControlPanel() {
       display: grid;
       grid-template-columns: repeat(3, 1fr);  /* 3列网格布局 */
       gap: 10px;  /* 卡片之间的间距 */
+      scrollbar-width: thin;
     }
     
     .history-card {
@@ -370,9 +409,23 @@ function injectControlPanel() {
     clearHistory();
   });
   
+  // 添加刷新历史记录按钮事件监听器
+  document.getElementById('refresh-history-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); // 阻止事件冒泡
+    refreshHistoryDisplay();
+  });
+  
+  // 添加主题切换按钮事件监听器
+  document.getElementById('theme-toggle-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); // 阻止事件冒泡
+    toggleTheme();
+  });
+  
   // 加载历史记录
   loadFromStorage().then(() => {
     refreshHistoryDisplay();
+    // 检查是否已有主题设置
+    checkSavedTheme();
   });
 }
 
@@ -382,6 +435,28 @@ function clearHistory() {
     feedHistory = [];
     saveToStorage();
     refreshHistoryDisplay();
+  }
+}
+
+// 切换主题
+function toggleTheme() {
+  const historyContent = document.getElementById('history-content');
+  if (historyContent.classList.contains('dark-theme')) {
+    historyContent.classList.remove('dark-theme');
+    localStorage.setItem('bilibiliFeedTheme', 'light');
+  } else {
+    historyContent.classList.add('dark-theme');
+    localStorage.setItem('bilibiliFeedTheme', 'dark');
+  }
+}
+
+// 检查已保存的主题设置
+function checkSavedTheme() {
+  const savedTheme = localStorage.getItem('bilibiliFeedTheme');
+  const historyContent = document.getElementById('history-content');
+  
+  if (savedTheme === 'dark') {
+    historyContent.classList.add('dark-theme');
   }
 }
 

@@ -31,8 +31,9 @@ Bilibili Feed History 浏览器扩展可以帮助你解决这个问题！它会�
 - 在历史记录面板中可以查看所有保存过的推荐视频
 - 视频按时间倒序排列，最新的保存记录在最上面
 
-![img](img.png)
-![img](img1.png)
+![img](images/img.png)
+![img](images/img1.png)
+![img](images/img2.png)
 
 
 ## 技术特点
@@ -40,7 +41,3 @@ Bilibili Feed History 浏览器扩展可以帮助你解决这个问题！它会�
 - 支持多种B站页面结构，兼容不同的页面布局
 - 自动清理克隆元素中的潜在安全风险
 - 采用轻量级本地存储，不影响浏览器性能
-
-## 贡献
-
-欢迎提交Issue和Pull Request来帮助改进这个项目。
