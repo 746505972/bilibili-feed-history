@@ -2,23 +2,21 @@
   "manifest_version": 3,
   "name": "Bilibili Feed History",
   "version": "1.0.0",
-  "description": "保存B站推荐视频的历史记录，方便找回之前被换掉的视频",
+  "description": "保存B站首页推荐视频的历史记录，方便找回被刷新掉的内容",
   "permissions": [
-    "storage",
-    "activeTab"
+    "storage"
   ],
   "host_permissions": [
-    "*://www.bilibili.com/*"
+    "https://www.bilibili.com/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://www.bilibili.com/*"],
+      "matches": ["https://www.bilibili.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_popup": "popup.html",
     "default_title": "Bilibili Feed History"
   }
 }

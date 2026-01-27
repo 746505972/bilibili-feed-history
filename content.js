@@ -244,8 +244,8 @@ function injectControlPanel() {
       <div class="history-header">
         <h3>B站推荐历史</h3>
         <div>
-          <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: #ff69b4; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">清空历史</button>
-          <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">刷新</button>
+          <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">🗑️</button>
+          <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🔄️</button>
           <button id="theme-toggle-btn" title="切换暗黑主题" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🌙</button>
         </div>
         <div id="history-stats">已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</div>
@@ -441,12 +441,16 @@ function clearHistory() {
 // 切换主题
 function toggleTheme() {
   const historyContent = document.getElementById('history-content');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  
   if (historyContent.classList.contains('dark-theme')) {
     historyContent.classList.remove('dark-theme');
     localStorage.setItem('bilibiliFeedTheme', 'light');
+    themeToggleBtn.textContent = '🌙'; // 切换回亮色主题时显示月亮图标
   } else {
     historyContent.classList.add('dark-theme');
     localStorage.setItem('bilibiliFeedTheme', 'dark');
+    themeToggleBtn.textContent = '☀️'; // 切换到暗色主题时显示太阳图标
   }
 }
 
@@ -454,9 +458,11 @@ function toggleTheme() {
 function checkSavedTheme() {
   const savedTheme = localStorage.getItem('bilibiliFeedTheme');
   const historyContent = document.getElementById('history-content');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
   
   if (savedTheme === 'dark') {
     historyContent.classList.add('dark-theme');
+    themeToggleBtn.textContent = '☀️'; // 如果已保存的是暗色主题，按钮应显示太阳图标
   }
 }
 
