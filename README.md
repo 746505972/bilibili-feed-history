@@ -19,6 +19,12 @@ Bilibili Feed History 浏览器扩展可以帮助你解决这个问题！它会�
 
 ## 安装方法
 
+1. 在Edge浏览器：进入 `edge://extensions/`
+2. 获取 Microsoft Edge 扩展
+3. 搜索并添加Bilibili Feed History
+
+---
+
 1. 下载本扩展的所有文件
 2. 打开Chrome浏览器，进入 `chrome://extensions/`
 3. 开启"开发者模式"

@@ -188,7 +188,7 @@ function saveToStorage() {
     }))
   }, function() {
     if (chrome.runtime.lastError) {
-      console.error('保存历史记录失败:', chrome.runtime.lastError);
+      console.error('Bilibili Feed History - 保存历史记录失败:', chrome.runtime.lastError);
     }
   });
 }
@@ -262,7 +262,7 @@ function injectControlPanel() {
         <div id="history-stats">
           <span>已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</span>
           <span style="margin-left: 15px;">保存上限: </span>
-          <input type="number" id="history-limit-input" min="1" max="99999" value="${getHistoryLimit()}" style="width: 80px; padding: 2px 5px; margin-left: 5px;" />
+          <input type="number" id="history-limit-input" min="1" max="99999" value="${getHistoryLimit()}" style="width: 80px; padding: 2px 5px; margin-left: 5px; background: transparent;color: #666;" />
         </div>
         <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">🗑️</button>
         <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🔄️</button>
@@ -450,6 +450,19 @@ function injectControlPanel() {
     } else {
       // 如果输入无效，恢复为之前的值
       e.target.value = getHistoryLimit();
+    }
+  });
+  
+  // 添加点击外部区域关闭面板功能
+  document.addEventListener('click', function(event) {
+    const panel = document.getElementById('bilibili-feed-history-panel');
+    // const toggleBtn = document.getElementById('history-toggle-btn');
+    
+    // 检查点击是否发生在面板外部
+    if (!panel.contains(event.target) && 
+        panel.getBoundingClientRect().left >= -50 && 
+        document.getElementById('history-content').style.display === 'block') {
+      document.getElementById('history-content').style.display = 'none';
     }
   });
   
