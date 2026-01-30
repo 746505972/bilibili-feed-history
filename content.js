@@ -55,16 +55,6 @@ function startObserving() {
             }
           });
         }
-        
-        // 检查新增节点，确保我们正在跟踪正确的区域
-        if (mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach(node => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              // 注入控制按钮到换一换按钮旁边
-              injectRefreshButton(node);
-            }
-          });
-        }
       }
     }
   });
@@ -137,10 +127,8 @@ function saveFeedCard(feedCardElement) {
       timestamp: timestamp
     });
     
-    // 限制历史记录数量，防止内存占用过多
-    if (feedHistory.length > 200) {
-      feedHistory.shift(); // 移除最早的记录
-    }
+    // 修剪超出限制的历史记录
+    trimHistoryIfNeeded();
     
     // 保存到本地存储
     saveToStorage();
@@ -205,6 +193,32 @@ function saveToStorage() {
   });
 }
 
+// 获取历史记录限制，默认为1000
+function getHistoryLimit() {
+  const limit = localStorage.getItem('bilibiliFeedHistoryLimit');
+  return limit ? parseInt(limit) : 1000;
+}
+
+// 设置历史记录限制
+function setHistoryLimit(limit) {
+  // 限制范围在1到99999之间
+  const clampedLimit = Math.max(1, Math.min(99999, limit));
+  localStorage.setItem('bilibiliFeedHistoryLimit', clampedLimit);
+}
+
+// 根据限制修剪历史记录
+function trimHistoryIfNeeded() {
+  const limit = getHistoryLimit();
+  if (feedHistory.length > limit) {
+    // 计算需要删除的数量
+    const excessCount = feedHistory.length - limit;
+    // 删除最老的记录
+    feedHistory.splice(0, excessCount);
+    // 保存到存储
+    saveToStorage();
+  }
+}
+
 // 从存储加载历史记录
 async function loadFromStorage() {
   return new Promise((resolve) => {
@@ -215,6 +229,8 @@ async function loadFromStorage() {
           element: createElementFromHTML(item.html),
           timestamp: item.timestamp
         }));
+        // 加载后根据限制裁剪历史记录
+        trimHistoryIfNeeded();
       }
       resolve();
     });
@@ -243,12 +259,14 @@ function injectControlPanel() {
     <div id="history-content" style="display: none;">
       <div class="history-header">
         <h3>B站推荐历史</h3>
-        <div>
-          <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">🗑️</button>
-          <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🔄️</button>
-          <button id="theme-toggle-btn" title="切换暗黑主题" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🌙</button>
+        <div id="history-stats">
+          <span>已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</span>
+          <span style="margin-left: 15px;">保存上限: </span>
+          <input type="number" id="history-limit-input" min="1" max="99999" value="${getHistoryLimit()}" style="width: 80px; padding: 2px 5px; margin-left: 5px;" />
         </div>
-        <div id="history-stats">已保存 <span id="history-count-display">${feedHistory.length}</span> 个视频</div>
+        <button id="clear-history-btn" title="清空历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">🗑️</button>
+        <button id="refresh-history-btn" title="刷新历史记录" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🔄️</button>
+        <button id="theme-toggle-btn" title="切换暗黑主题" style="margin-left: 10px; background: transparent; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 10px;">🌙</button>
         <span id="close-history-btn" title="关闭">×</span>
       </div>
       <div id="history-videos"></div>
@@ -420,6 +438,20 @@ function injectControlPanel() {
     e.stopPropagation(); // 阻止事件冒泡
     toggleTheme();
   });
+
+  // 添加历史记录数量限制输入框事件监听器
+  document.getElementById('history-limit-input').addEventListener('change', function(e) {
+    e.stopPropagation(); // 阻止事件冒泡
+    const newValue = parseInt(e.target.value);
+    if (!isNaN(newValue) && newValue > 0) {
+      setHistoryLimit(newValue);
+      trimHistoryIfNeeded();
+      refreshHistoryDisplay();
+    } else {
+      // 如果输入无效，恢复为之前的值
+      e.target.value = getHistoryLimit();
+    }
+  });
   
   // 加载历史记录
   loadFromStorage().then(() => {
@@ -481,6 +513,12 @@ function toggleHistoryPanel() {
 function refreshHistoryDisplay() {
   // 更新统计数字
   document.getElementById('history-count-display').textContent = feedHistory.length;
+  
+  // 更新输入框的值
+  const limitInput = document.getElementById('history-limit-input');
+  if (limitInput && !isNaN(getHistoryLimit())) {
+    limitInput.value = getHistoryLimit();
+  }
   
   const container = document.getElementById('history-videos');
   container.innerHTML = '';
@@ -547,46 +585,6 @@ function cleanClonedElement(element) {
   });
 }
 
-// 在换一换按钮附近注入自定义按钮
-function injectRefreshButton(node) {
-  // 查找换一换按钮或其他可能的刷新按钮
-  const possibleSelectors = ['.refresh-btn', '[class*="refresh"]', '[class*="shuffle"]', '[class*="random"]'];
-  let refreshBtn = null;
-  
-  for (const selector of possibleSelectors) {
-    refreshBtn = node.querySelector && node.querySelector(selector) || 
-                 document.querySelector(selector);
-                 
-    if (refreshBtn) {
-      break;
-    }
-  }
-  
-  if (refreshBtn && !document.getElementById('custom-history-btn')) {
-    const customBtn = document.createElement('button');
-    customBtn.id = 'custom-history-btn';
-    customBtn.textContent = '查看历史推荐';
-    customBtn.style = `
-      margin-left: 10px;
-      padding: 4px 8px;
-      font-size: 12px;
-      background: #f4f4f4;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      cursor: pointer;
-    `;
-    
-    customBtn.addEventListener('click', function() {
-      toggleHistoryPanel();
-    });
-    
-    // 尝试将按钮插入到刷新按钮旁边
-    if (refreshBtn.parentNode) {
-      refreshBtn.parentNode.appendChild(customBtn);
-    }
-  }
-}
-
 // 确保页面完全加载后初始化插件
 function ensurePageLoaded() {
   if (document.readyState === 'loading') {
@@ -602,14 +600,6 @@ function ensurePageLoaded() {
     }, 1000);
   }
 }
-
-// 页面可见性改变时重新检查
-document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) {
-    // 页面变为可见时，重新尝试注入按钮
-    setTimeout(injectRefreshButton, 1000);
-  }
-});
 
 // 启动插件初始化
 ensurePageLoaded();
